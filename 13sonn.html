@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modüler Dolap Tasarımı</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+        }
+        .container {
+            width: 90%;
+            max-width: 1200px;
+            margin: 20px auto;
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .selection-panel, .summary-panel {
+            margin-top: 20px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        .totals {
+            text-align: right;
+            margin-top: 10px;
+        }
+        .totals p {
+            margin: 5px 0;
+        }
+        #whatsapp-order {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #25d366;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        #whatsapp-order:hover {
+            background-color: #20c25d;
+        }
+        input.quantity-input {
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Modüler Dolap Tasarımı</h1>
+        <div class="selection-panel">
+            <h2>Ürün Seçimi</h2>
+            <select id="product-type">
+                <option value="">Ürün Tipi Seç</option>
+                <option value="gövde">Gövde</option>
+                <option value="kapak">Kapak</option>
+                <option value="yan-dikme">Yan Dikme</option>
+            </select>
+            <select id="product-code">
+                <option value="">Ürün Kodu Seç</option>
+            </select>
+            <input type="number" id="product-quantity" min="1" value="1">
+            <button id="add-to-cart">Siparişe Ekle</button>
+        </div>
+        <div class="summary-panel">
+            <h2>Seçimleriniz</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ürün Tipi</th>
+                        <th>Ürün Kodu</th>
+                        <th>Açıklama</th>
+                        <th>Adet</th>
+                        <th>Birim Fiyat</th>
+                        <th>Tutar</th>
+                    </tr>
+                </thead>
+                <tbody id="summary-table"></tbody>
+            </table>
+            <div class="totals">
+                <p>Alt Toplam: <span id="subtotal">₺0.00</span></p>
+                <p>KDV (%10): <span id="vat">₺0.00</span></p>
+                <p>Genel Toplam: <span id="total">₺0.00</span></p>
+            </div>
+        </div>
+    </div>
+    <script>
+        const productData = {
+            gövde: [
+                { code: "DLP 001", name: "Kotonvizon MDFlam Gövde-80x220", price: 14400 },
+                { code: "DLP 002", name: "Kotonvizon MDFlam Gövde-80x220", price: 14760 },
+                { code: "DLP 003", name: "Kotonvizon MDFlam Gövde-80x220", price: 11700 },
+                { code: "DLP 004", name: "Kotonvizon MDFlam Gövde-80x220", price: 13140 },
+                { code: "DLP 005", name: "Kotonvizon MDFlam Gövde-80x220", price: 13320 },
+                { code: "DLP 006", name: "Kotonvizon MDFlam Gövde-80x220", price: 14040 },
+                { code: "DLP 007", name: "Kotonvizon MDFlam Gövde-80x220", price: 10620 },
+                { code: "DLP 008", name: "Kotonvizon MDFlam Gövde-80x220", price: 13320 },
+                { code: "DLP 009", name: "Kotonvizon MDFlam Gövde-80x220", price: 13320 },
+                { code: "DLP 010", name: "Kotonvizon MDFlam Gövde-40x220", price: 11520 },
+                { code: "DLP 011", name: "Kotonvizon MDFlam Gövde-40x220", price: 10440 },
+                { code: "DLP 012", name: "Kotonvizon MDFlam Gövde-40x220", price: 10080 }
+            ],
+            kapak: [
+                { code: "KP 001", name: "Meşe MDFlam Kapak-40x218", price: 3150 },
+                { code: "KP 002", name: "Ceviz MDFlam Kapak-40x218", price: 3150 },
+                { code: "KP 003", name: "Koyu Gri Soft Touch Kapak-40x218", price: 3420 },
+                { code: "KP 004", name: "Açık Gri Soft Touch Kapak-40x218", price: 3420 },
+                { code: "KP 005", name: "Vizon Soft Touch Kapak-40x218", price: 3420 },
+                { code: "KP 006", name: "Yeşil Soft Touch Kapak-40x218", price: 3420 },
+                { code: "KP 007", name: "Beyaz Soft Touch Kapak-40x218", price: 3420 },
+                { code: "KP 008", name: "Normal Ayna Kapak-40x218", price: 4410 },
+                { code: "KP 009", name: "Füme Ayna Kapak-40x218", price: 4680 },
+                { code: "KP 010", name: "Bronz Ayna Kapak-40x218", price: 4680 },
+                { code: "KP 011", name: "Reflekte Cam Kapak-40x218", price: 4500 },
+                { code: "KP 012", name: "Fugalı Lake-Sol Kapak-40x218", price: 5400 },
+                { code: "KP 013", name: "Fugalı Lake-Sağ Kapak-40x218", price: 5400 },
+                { code: "KP 014", name: "Çerçeveli Lake-1-40x218", price: 5850 },
+                { code: "KP 015", name: "Çerçeveli Lake-2-40x218", price: 6300 }
+            ],
+            "yan-dikme": [
+                { code: "YD 001", name: "Meşe MDFlam Yan Dikme-60x220", price: 3150 },
+                { code: "YD 002", name: "Ceviz MDFlam Yan Dikme-60x220", price: 3150 },
+                { code: "YD 003", name: "Koyu Gri Soft Touch Yan Dikme-60x220", price: 4050 },
+                { code: "YD 004", name: "Açık Gri Soft Touch Yan Dikme-60x220", price: 4050 },
+                { code: "YD 005", name: "Yeşil Soft Touch Yan Dikme-60x220", price: 4050 },
+                { code: "YD 006", name: "Beyaz Soft Touch Yan Dikme-60x220", price: 4050 },
+                { code: "YD 007", name: "Vizon Soft Touch Yan Dikme-60x220", price: 4050 },
+                { code: "YD 008", name: "Lake Yan Dikme-60x220", price: 5040 }
+            ]
+        };
+
+        document.getElementById("product-type").addEventListener("change", function () {
+            const productType = this.value;
+            const productCodeSelect = document.getElementById("product-code");
+            productCodeSelect.innerHTML = "<option value=''>Ürün Kodu Seç</option>";
+
+            if (productData[productType]) {
+                productData[productType].forEach(product => {
+                    const option = document.createElement("option");
+                    option.value = product.code;
+                    option.textContent = `${product.code} - ${product.name}`;
+                    productCodeSelect.appendChild(option);
+                });
+            } else {
+                console.error("Geçersiz ürün tipi veya data eksik: ", productType);
+            }
+        });
+
+        document.getElementById("add-to-cart").addEventListener("click", function () {
+            const productType = document.getElementById("product-type").value;
+            const productCode = document.getElementById("product-code").value;
+            const quantity = parseInt(document.getElementById("product-quantity").value);
+            const summaryTable = document.getElementById("summary-table");
+
+            if (productType && productCode && quantity > 0) {
+                const product = productData[productType].find(p => p.code === productCode);
+                if (product) {
+                    const existingRow = Array.from(summaryTable.rows).find(row => row.cells[1].textContent === productCode);
+                    if (existingRow) {
+                        const qtyCell = existingRow.cells[3].firstChild;
+                        qtyCell.value = parseInt(qtyCell.value) + quantity;
+                        const totalCell = existingRow.cells[5];
+                        totalCell.textContent = `₺${(product.price * parseInt(qtyCell.value)).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}`;
+                    } else {
+                        const row = document.createElement("tr");
+                        row.innerHTML = `
+                            <td>${productType}</td>
+                            <td>${product.code}</td>
+                            <td>${product.name}</td>
+                            <td><input type="number" class="quantity-input" value="${quantity}" min="0" onchange="updateQuantity(this, '${product.code}')"></td>
+                            <td>₺${product.price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</td>
+                            <td>₺${(product.price * quantity).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</td>
+                        `;
+                        summaryTable.appendChild(row);
+                    }
+                    updateTotals();
+                }
+            }
+        });
+
+        function updateQuantity(input, productCode) {
+            const row = Array.from(document.querySelectorAll("#summary-table tr")).find(row => row.cells[1].textContent === productCode);
+            if (row) {
+                const quantity = parseInt(input.value);
+                const price = parseFloat(row.cells[4].textContent.replace("₺", "").replace(/,/g, ""));
+                const totalCell = row.cells[5];
+
+                if (quantity === 0) {
+                    row.remove();
+                } else {
+                    totalCell.textContent = `₺${(price * quantity * 1000).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}`;
+                }
+                updateTotals();
+            }
+        }
+
+        function updateTotals() {
+            const rows = document.querySelectorAll("#summary-table tr");
+            let subtotal = 0;
+            rows.forEach(row => {
+                const totalCell = row.cells[5];
+                subtotal += parseFloat(totalCell.textContent.replace("₺", "").replace(/,/g, ""))*1000;
+            });
+            const vat = subtotal * 0.1;
+            const total = subtotal + vat;
+
+            document.getElementById("subtotal").textContent = `₺${subtotal.toFixed(2)}`;
+            document.getElementById("vat").textContent = `₺${vat.toFixed(2)}`;
+            document.getElementById("total").textContent = `₺${total.toFixed(2)}`;
+        }
+    </script>
+</body>
+</html>
