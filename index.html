@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modüler Dolap Tasarımı</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Modüler Dolap Tasarımı</h1>
+        <div class="selection-panel">
+            <h2>Ürün Seçimi</h2>
+            <select id="product-type">
+                <option value="">Ürün Tipi Seç</option>
+                <option value="gövde">Gövde</option>
+                <option value="kapak">Kapak</option>
+                <option value="yan-dikme">Yan Dikme</option>
+            </select>
+            <select id="product-code">
+                <option value="">Ürün Kodu Seç</option>
+            </select>
+            <input type="number" id="product-quantity" min="1" value="1">
+            <button id="add-to-cart">Siparişe Ekle</button>
+        </div>
+        <div class="summary-panel">
+            <h2>Seçimleriniz</h2>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ürün Tipi</th>
+                        <th>Ürün Kodu</th>
+                        <th>Açıklama</th>
+			<th>Ürün Görseli</th>
+                        <th>Adet</th>
+                        <th>Birim Fiyat</th>
+                        <th>Tutar</th>
+                    </tr>
+                </thead>
+                <tbody id="summary-table"></tbody>
+            </table>
+            <div class="totals">
+                <p>Alt Toplam: <span id="subtotal">₺0.00</span></p>
+                <p>KDV (%10): <span id="vat">₺0.00</span></p>
+                <p>Genel Toplam: <span id="total">₺0.00</span></p>
+            </div>
+        </div>
+        <!-- WhatsApp Sipariş Hattı Butonu -->
+        <a id="whatsapp-order" href="https://wa.me/905525557474?text=Merhaba,%20sipariş%20vermek%20istiyorum." target="_blank">
+            WhatsApp Sipariş Hattı
+        </a>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
