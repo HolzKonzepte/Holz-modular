@@ -79,6 +79,17 @@
             border-radius: 4px;
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
+        .remove-button {
+            color: white;
+            background-color: red;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .remove-button:hover {
+            background-color: darkred;
+        }
     </style>
 </head>
 <body>
@@ -106,9 +117,11 @@
                         <th>Ürün Tipi</th>
                         <th>Ürün Kodu</th>
                         <th>Açıklama</th>
+                        <th>Ürün Görseli</th>
                         <th>Adet</th>
                         <th>Birim Fiyat</th>
                         <th>Tutar</th>
+                        <th>İşlem</th>
                     </tr>
                 </thead>
                 <tbody id="summary-table"></tbody>
@@ -152,7 +165,7 @@
                 { code: "KP 010", name: "Bronz Ayna Kapak-40x218", price: 4680, image: "images/kp010.jpg" },
                 { code: "KP 011", name: "Reflekte Cam Kapak-40x218", price: 4500, image: "images/kp011.jpg" },
                 { code: "KP 012", name: "Fugalı Lake-Sol Kapak-40x218", price: 5400, image: "images/kp012.jpg" },
-                { code: "KP 013", name: "Fugalı Lake-Sağ Kapak-40x218", price: 5400, image: "images/kp013.jpg" },
+                { code: "KP 013", name: "Fugalı Lake-Sağ Kapak-40x218", price                : 5400, image: "images/kp013.jpg" },
                 { code: "KP 014", name: "Çerçeveli Lake-1 Kapak-40x218", price: 5850, image: "images/kp014.jpg" },
                 { code: "KP 015", name: "Çerçeveli Lake-2 Kapak-40x218", price: 6300, image: "images/kp015.jpg" }
             ],
@@ -191,14 +204,24 @@
             const quantity = parseInt(document.getElementById("product-quantity").value);
             const summaryTable = document.getElementById("summary-table");
 
-            if (productType && productCode && quantity > 0) {
+            if (!productType) {
+                alert("Lütfen bir ürün tipi seçiniz!");
+                return;
+            }
+
+            if (!productCode) {
+                alert("Lütfen bir ürün kodu seçiniz!");
+                return;
+            }
+
+            if (quantity > 0) {
                 const product = productData[productType].find(p => p.code === productCode);
                 if (product) {
                     const existingRow = Array.from(summaryTable.rows).find(row => row.cells[1].textContent === productCode);
                     if (existingRow) {
-                        const qtyCell = existingRow.cells[3].firstChild;
+                        const qtyCell = existingRow.cells[4].firstChild;
                         qtyCell.value = parseInt(qtyCell.value) + quantity;
-                        const totalCell = existingRow.cells[5];
+                        const totalCell = existingRow.cells[6];
                         totalCell.textContent = `₺${(product.price * parseInt(qtyCell.value)).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}`;
                     } else {
                         const row = document.createElement("tr");
@@ -206,14 +229,15 @@
                             <td>${productType}</td>
                             <td>${product.code}</td>
                             <td>${product.name}</td>
+                            <td><img src="${product.image}" alt="${product.name}" style="width: 50px; height: auto;"></td>
                             <td><input type="number" class="quantity-input" value="${quantity}" min="0" onchange="updateQuantity(this, '${product.code}')"></td>
                             <td>₺${product.price.toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</td>
                             <td>₺${(product.price * quantity).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}</td>
+                            <td><button class="remove-button" onclick="removeItem('${product.code}')">Kaldır</button></td>
                         `;
                         summaryTable.appendChild(row);
                     }
                     updateTotals();
-                    updateImagePanel();
                 }
             }
         });
@@ -222,16 +246,24 @@
             const row = Array.from(document.querySelectorAll("#summary-table tr")).find(row => row.cells[1].textContent === productCode);
             if (row) {
                 const quantity = parseInt(input.value);
-                const price = parseFloat(row.cells[4].textContent.replace("₺", "").replace(/,/g, ""));
-                const totalCell = row.cells[5];
+                const price = parseFloat(row.cells[5].textContent.replace("₺", "").replace(/,/g, ""));
+                const totalCell = row.cells[6];
 
                 if (quantity === 0) {
                     row.remove();
                 } else {
-                    totalCell.textContent = `₺${(price * quantity * 1000).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}`;
+                    totalCell.textContent = `₺${(price * quantity).toLocaleString("tr-TR", { minimumFractionDigits: 2 })}`;
                 }
                 updateTotals();
-                updateImagePanel();
+            }
+        }
+
+        function removeItem(productCode) {
+            const summaryTable = document.getElementById("summary-table");
+            const row = Array.from(summaryTable.rows).find(row => row.cells[1].textContent === productCode);
+            if (row) {
+                row.remove();
+                updateTotals();
             }
         }
 
@@ -239,8 +271,8 @@
             const rows = document.querySelectorAll("#summary-table tr");
             let subtotal = 0;
             rows.forEach(row => {
-                const totalCell = row.cells[5];
-                subtotal += parseFloat(totalCell.textContent.replace("₺", "").replace(/,/g, "")) * 1000;
+                const totalCell = row.cells[6];
+                subtotal += parseFloat(totalCell.textContent.replace("₺", "").replace(/,/g, ""))*1000;
             });
             const vat = subtotal * 0.1;
             const total = subtotal + vat;
@@ -249,23 +281,7 @@
             document.getElementById("vat").textContent = `₺${vat.toFixed(2)}`;
             document.getElementById("total").textContent = `₺${total.toFixed(2)}`;
         }
-
-        function updateImagePanel() {
-            const imagePanel = document.getElementById("selected-images");
-            imagePanel.innerHTML = ""; // Paneli temizle
-            const rows = document.querySelectorAll("#summary-table tr");
-            rows.forEach(row => {
-                const productCode = row.cells[1].textContent;
-                const productType = row.cells[0].textContent;
-                const product = productData[productType].find(p => p.code === productCode);
-                if (product && product.image) {
-                    const img = document.createElement("img");
-                    img.src = product.image;
-                    img.alt = product.name;
-                    imagePanel.appendChild(img);
-                }
-            });
-        }
     </script>
 </body>
 </html>
+
