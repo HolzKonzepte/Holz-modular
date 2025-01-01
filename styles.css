@@ -300,5 +300,82 @@ h1 {
     height: fit-content;
 }
 
+/* Mobil cihazlar için medya sorguları ve tasarım iyileştirmeleri */
 
+@media screen and (max-width: 768px) {
+    /* Genel konteyner daraltma */
+    .container {
+        width: 95%;
+        padding: 10px;
+    }
 
+    /* Başlık boyutunu küçültme */
+    h1 {
+        font-size: 1.4rem;
+    }
+
+    /* Ürün kartlarının mobil uyumlu hale getirilmesi */
+    .product-card {
+        width: 100%; /* Tam genişlikte olacak şekilde ayarlandı */
+        margin-bottom: 15px;
+    }
+
+    .product-card img {
+        max-width: 100%; /* Görüntüler genişlik sınırına uyar */
+        height: auto;
+    }
+
+    .product-card h3 {
+        font-size: 1rem;
+    }
+
+    .product-card p {
+        font-size: 0.8rem;
+    }
+
+    /* Tablo hücrelerini daraltma */
+    table {
+        font-size: 0.8rem;
+    }
+
+    th, td {
+        padding: 5px;
+    }
+
+    /* Butonları küçültme */
+    button, a {
+        font-size: 0.9rem;
+        padding: 8px;
+    }
+
+    /* WhatsApp butonu */
+    #whatsapp-order {
+        font-size: 0.8rem;
+        padding: 8px 15px;
+    }
+}
+
+@media screen and (max-width: 480px) {
+    /* En küçük ekranlar için özel ayarlar */
+    h1 {
+        font-size: 1.2rem;
+    }
+
+    .product-card {
+        padding: 10px;
+    }
+
+    .product-card img {
+        max-width: 80px; /* Daha küçük görüntü */
+    }
+
+    .totals p {
+        font-size: 0.8rem;
+    }
+
+    /* Dropdown ve miktar kutularını optimize etme */
+    #product-type, #product-code, #product-quantity {
+        font-size: 0.8rem;
+        padding: 5px;
+    }
+}
