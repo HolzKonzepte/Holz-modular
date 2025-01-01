@@ -132,7 +132,7 @@ document.getElementById("whatsapp-order").addEventListener("click", function (e)
         return;
     }
 
-    let message = "Merhaba, sipariş vermek istiyorum.Ürünler:";
+    let message = "Merhaba, sipariş vermek istiyorum. Ürünler:";
 
     rows.forEach(row => {
         const productType = row.cells[0].textContent;
@@ -141,14 +141,14 @@ document.getElementById("whatsapp-order").addEventListener("click", function (e)
         const quantity = row.cells[4].textContent;
         const unitPrice = row.cells[5].textContent;
         const total = row.cells[6].textContent;
-        message += `- ${productType}: ${productCode} - ${productName} (${quantity} adet, Birim Fiyat: ${unitPrice}, Toplam: ${total})`;
+        message += `\n- ${productType}: ${productCode} - ${productName} (${quantity} adet, Birim Fiyat: ${unitPrice}, Toplam: ${total})`;
     });
 
     const subtotal = document.getElementById("subtotal").textContent;
     const vat = document.getElementById("vat").textContent;
     const total = document.getElementById("total").textContent;
 
-    message += `Alt Toplam: ${subtotal}KDV: ${vat}Genel Toplam: ${total}`;
+    message += `\n\nAlt Toplam: ${subtotal}\nKDV: ${vat}\nGenel Toplam: ${total}`;
 
     const whatsappLink = `https://wa.me/905525557474?text=${encodeURIComponent(message)}`;
     window.open(whatsappLink, "_blank");
